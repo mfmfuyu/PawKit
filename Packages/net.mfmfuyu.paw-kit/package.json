@@ -5,7 +5,11 @@
   "description": "Describe this Package",
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.avatars": "3.10.3"
+    "com.vrchat.avatars": "3.10.3",
+    "nadena.dev.ndmf": "1.12.0",
+    "dev.hai-vr.animator-as-code.v1": "1.2.0",
+    "dev.hai-vr.animator-as-code.v1.vrchat": "1.1.2",
+    "dev.hai-vr.animator-as-code.v1.modular-avatar": "1.1.2"
   },
   "author": {
     "name": "fuyu",
