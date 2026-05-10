@@ -1,13 +1,11 @@
 using System.Linq;
 using AnimatorAsCode.V1;
-using AnimatorAsCode.V1.ModularAvatar;
 using nadena.dev.ndmf;
 using PawKit.Editor;
 using PawKit.Editor.Builder;
 using PawKit.Runtime;
 using UnityEditor;
 using UnityEngine;
-using VRC.SDK3.Avatars.Components;
 
 [assembly: ExportsPlugin(typeof(PawKitPlugin))]
 
@@ -26,12 +24,12 @@ namespace PawKit.Editor
 
         private void Generate(BuildContext ctx)
         {
-            var pawGestures = ctx.AvatarRootTransform.GetComponentsInChildren<PawGesture>(true)
+            var gestures = ctx.AvatarRootTransform.GetComponentsInChildren<PawGesture>(true)
                 .GroupBy(c => c.gestureType)
                 .Select(g => g.First())
                 .ToArray();
-            
-            if (pawGestures.Length == 0) return;
+
+            if (gestures.Length == 0) return;
 
             var aac = AacV1.Create(new AacConfiguration
             {
@@ -43,19 +41,17 @@ namespace PawKit.Editor
                 DefaultsProvider = new AacDefaultsProvider()
             });
 
-            var coreGameObject = new GameObject(SystemName)
+            var root = new GameObject(SystemName)
             {
                 transform = { parent = ctx.AvatarRootTransform }
             };
+            var buildContext = new PawBuildContext(root, aac, gestures);
 
-            var modularAvatar = MaAc.Create(coreGameObject);
-
-            var animatorBuilder = new PawAnimatorBuilder(aac);
-
-            var left = animatorBuilder.Build(HandSide.Left, pawGestures);
-            modularAvatar.NewMergeAnimator(left.AnimatorController, VRCAvatarDescriptor.AnimLayerType.Gesture);
-            var right = animatorBuilder.Build(HandSide.Right, pawGestures);
-            modularAvatar.NewMergeAnimator(right.AnimatorController, VRCAvatarDescriptor.AnimLayerType.Gesture);
+            var animatorBuilder = new PawAnimatorBuilder(buildContext);
+            animatorBuilder.Build();
+            
+            var menuBuilder = new PawMenuBuilder(buildContext);
+            menuBuilder.Build();
         }
     }
 }
