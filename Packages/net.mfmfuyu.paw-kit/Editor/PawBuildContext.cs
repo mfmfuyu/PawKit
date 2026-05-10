@@ -28,7 +28,7 @@ namespace PawKit.Editor
             Gestures = gestures;
 
             Controller = aac.NewAnimatorController();
-            var layer = Controller.NewLayer(); // dummy
+            var layer = Controller.NewLayer("Internal");
 
             MaAc.NewMergeAnimator(Controller, VRCAvatarDescriptor.AnimLayerType.Gesture);
             TrackingParameter = layer.BoolParameter("Tracking");
