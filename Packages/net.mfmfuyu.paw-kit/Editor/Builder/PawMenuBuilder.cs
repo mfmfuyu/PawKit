@@ -29,34 +29,34 @@ namespace PawKit.Editor.Builder
                 transform = { parent = _ctx.Root.transform }
             };
             _ctx.MaAc.EditMenuItem(tracking).Name("Tracking").Toggle(_ctx.TrackingParameter);
-            
+
             BuildSubMenu(HandSide.Left);
             BuildSubMenu(HandSide.Right);
         }
-        
+
         private void BuildSubMenu(HandSide handSide)
         {
-            var sub = new GameObject()
+            var subMenuRoot = new GameObject
             {
                 name = handSide.ToString(),
                 transform = { parent = _ctx.Root.transform }
             };
-            
-            var menuItem = sub.AddComponent<ModularAvatarMenuItem>();
-            menuItem.Control = new VRCExpressionsMenu.Control()
+
+            var rootMenuItem = subMenuRoot.AddComponent<ModularAvatarMenuItem>();
+            rootMenuItem.Control = new VRCExpressionsMenu.Control
             {
                 type = VRCExpressionsMenu.Control.ControlType.SubMenu
             };
-            menuItem.MenuSource = SubmenuSource.Children;
-            
+            rootMenuItem.MenuSource = SubmenuSource.Children;
+
             foreach (var gesture in _ctx.Gestures)
             {
-                var a = new GameObject()
+                var subMenuItem = new GameObject
                 {
-                    transform = { parent = sub.transform }
+                    transform = { parent = subMenuRoot.transform }
                 };
 
-                _ctx.MaAc.EditMenuItem(a).Name(gesture.name).ToggleSets(
+                _ctx.MaAc.EditMenuItem(subMenuItem).Name(gesture.name).ToggleSets(
                     handSide == HandSide.Left ? _ctx.OverrideGestureLeftParameter : _ctx.OverrideGestureRightParameter,
                     Array.IndexOf(_ctx.Gestures, gesture) + 1
                 );

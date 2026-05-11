@@ -49,7 +49,7 @@ namespace PawKit.Editor
 
             var animatorBuilder = new PawAnimatorBuilder(buildContext);
             animatorBuilder.Build();
-            
+
             var menuBuilder = new PawMenuBuilder(buildContext);
             menuBuilder.Build();
         }

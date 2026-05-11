@@ -1,6 +1,5 @@
 ﻿using System;
 using AnimatorAsCode.V1.VRC;
-using PawKit.Runtime;
 
 namespace PawKit.Editor.Builder
 {
@@ -23,10 +22,12 @@ namespace PawKit.Editor.Builder
         {
             var avatarMask = handSide.ToAvatarMask(_ctx.Aac);
             var layer = _ctx.Controller.NewLayer(handSide.ToString()).WithAvatarMask(avatarMask);
-            
+
             var trackingElement = handSide.ToAv3TrackingElement();
-            var overrideParameter = handSide == HandSide.Left ? _ctx.OverrideGestureLeftParameter : _ctx.OverrideGestureRightParameter;
-            
+            var overrideParameter = handSide == HandSide.Left
+                ? _ctx.OverrideGestureLeftParameter
+                : _ctx.OverrideGestureRightParameter;
+
             var idleState = layer.NewState("Idle").TrackingTracks(trackingElement);
 
             var trackingState = layer.NewState("Tracking").TrackingTracks(trackingElement);
