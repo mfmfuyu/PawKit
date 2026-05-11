@@ -18,7 +18,9 @@ namespace PawKit.Editor
         public GameObject Root { get; }
 
         public AacFlBoolParameter TrackingParameter { get; }
-
+        public AacFlIntParameter OverrideGestureLeftParameter { get; }
+        public AacFlIntParameter OverrideGestureRightParameter { get; }
+        
         public PawBuildContext(GameObject root, AacFlBase aac, PawGesture[] gestures)
         {
             Root = root;
@@ -29,9 +31,13 @@ namespace PawKit.Editor
 
             Controller = aac.NewAnimatorController();
             var layer = Controller.NewLayer("Internal");
-
             MaAc.NewMergeAnimator(Controller, VRCAvatarDescriptor.AnimLayerType.Gesture);
+            
             TrackingParameter = layer.BoolParameter("Tracking");
+            OverrideGestureLeftParameter = layer.IntParameter("OverrideGestureLeft");
+            MaAc.NewParameter(OverrideGestureLeftParameter);
+            OverrideGestureRightParameter = layer.IntParameter("OverrideGestureRight");
+            MaAc.NewParameter(OverrideGestureRightParameter);
         }
     }
 }
