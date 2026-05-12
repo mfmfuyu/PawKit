@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AnimatorAsCode.V1.VRC;
 
 namespace PawKit.Editor.Builder
@@ -36,6 +37,9 @@ namespace PawKit.Editor.Builder
             trackingState.Exits().When(overrideParameter.IsNotEqualTo(0));
 
             var av3GestureParameter = handSide.ToAv3Gesture(layer);
+            var oppositeHandSide = handSide == HandSide.Left ? HandSide.Right : HandSide.Left;
+            var av3OppositeGestureParameter = oppositeHandSide.ToAv3Gesture(layer);
+
             foreach (var gesture in _ctx.Gestures)
             {
                 var name = gesture.gestureType.ToString();
@@ -46,16 +50,45 @@ namespace PawKit.Editor.Builder
                     .TrackingAnimates(trackingElement);
 
                 var av3Gesture = gesture.gestureType.ToAv3();
+                var av3OppositeGesture = gesture.oppositeGestureType.ToAv3();
 
-                // normal
-                idleState.TransitionsTo(state)
-                    .When(av3GestureParameter.IsEqualTo(av3Gesture)).And(overrideParameter.IsEqualTo(0));
+                if (gesture.isCombination)
+                    // combination
+                    idleState.TransitionsTo(state)
+                        .When(av3GestureParameter.IsEqualTo(av3Gesture))
+                        .And(av3OppositeGestureParameter.IsEqualTo(av3OppositeGesture))
+                        .And(overrideParameter.IsEqualTo(0));
+                else
+                    // normal
+                    idleState.TransitionsTo(state)
+                        .When(av3GestureParameter.IsEqualTo(av3Gesture))
+                        .And(overrideParameter.IsEqualTo(0));
+
                 // override mode
                 idleState.TransitionsTo(state)
                     .When(overrideParameter.IsEqualTo(idx));
 
-                // normal
-                state.Exits().When(av3GestureParameter.IsNotEqualTo(av3Gesture)).And(overrideParameter.IsEqualTo(0));
+                if (gesture.isCombination)
+                {
+                    state.Exits().When(av3GestureParameter.IsNotEqualTo(av3Gesture))
+                        .And(overrideParameter.IsEqualTo(0))
+                        .Or()
+                        .When(av3OppositeGestureParameter.IsNotEqualTo(av3OppositeGesture))
+                        .And(overrideParameter.IsEqualTo(0));
+                }
+                else
+                {
+                    state.Exits().When(av3GestureParameter.IsNotEqualTo(av3Gesture))
+                        .And(overrideParameter.IsEqualTo(0));
+
+                    var combos = _ctx.Gestures.Where(g => g.isCombination && g.gestureType == gesture.gestureType)
+                        .Select(g => g.oppositeGestureType.ToAv3());
+
+                    foreach (var combo in combos)
+                        state.Exits().When(av3OppositeGestureParameter.IsEqualTo(combo))
+                            .And(overrideParameter.IsEqualTo(0));
+                }
+
                 // tracking mode
                 state.Exits().When(_ctx.TrackingParameter.IsTrue());
                 // override mode

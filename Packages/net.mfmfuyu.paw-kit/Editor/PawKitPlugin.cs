@@ -25,8 +25,7 @@ namespace PawKit.Editor
         private void Generate(BuildContext ctx)
         {
             var gestures = ctx.AvatarRootTransform.GetComponentsInChildren<PawGesture>(true)
-                .GroupBy(c => c.gestureType)
-                .Select(g => g.First())
+                .OrderByDescending(g => g.isCombination)
                 .ToArray();
 
             if (gestures.Length == 0) return;
